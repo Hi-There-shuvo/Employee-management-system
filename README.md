@@ -1,141 +1,88 @@
-# 🏢 Employee Management System (EMS)
+# Employee Management System
 
-A full-stack web application built with **Django** for managing employees, departments, attendance, leaves, and salaries within an organization. Features role-based access control for Admin and Employee users.
+A comprehensive, production-ready Employee Management System built with Django, featuring cloud database integration (Neon DB) and external media storage (Cloudinary).
+
+![Project Version](https://img.shields.io/badge/version-1.0.0-blue)
+![Python](https://img.shields.io/badge/Python-3.13-success)
+![Django](https://img.shields.io/badge/Django-5.2.7-success)
+![Render](https://img.shields.io/badge/Deployed_on-Render-purple)
+![License](https://img.shields.io/badge/License-MIT-green)
+
+---
+
+## 🔗 Live Application
+**Live Demo:** [https://employee-management-system-m4dk.onrender.com](https://employee-management-system-m4dk.onrender.com)
 
 ---
 
 ## ✨ Features
-
-### Admin Panel
-- 📊 **Dashboard** — Summary stats, department bar chart, attendance doughnut chart, pending leave requests
-- 👥 **Employee Management** — Create, view, edit, delete employees with profile pictures
-- 🏗️ **Department Management** — Create, edit, delete departments with employee counts
-- 📅 **Attendance Tracking** — View all records, filter by employee name, status, and date
-- 📝 **Leave Management** — View all leave requests, approve/reject with remarks
-- 💰 **Salary Management** — Add salary records for employees
-
-### Employee Portal
-- 👤 **My Profile** — View and update personal profile information
-- ⏰ **Attendance** — Check in/out with automatic late detection (after 9:00 AM)
-- 🗓️ **Leave Application** — Apply for sick, casual, annual, or other leave types
-- 💵 **My Salary** — View personal salary history
-
-### Security & Access
-- 🔐 Role-based access control with custom decorators (`@admin_required`, `@login_required`)
-- 🔑 Password change functionality for all users
-- 🪤 Honeypot fake admin panel at `/admin/` for security
+* **Employee Directory:** comprehensive management of employee profiles.
+* **Attendance Tracking:** Keep secure records of employee check-ins/outs.
+* **Leave Management:** Employees can request leaves with admin approvals.
+* **Department Sorting:** Classify and filter employees by department.
+* **Salary Tracking:** Secure management and viewing of payroll information.
+* **Profile Pictures (Cloud Media):** Employee avatars are reliably hosted remotely via Cloudinary integration.
+* **Secure Honeypot Admin:** Custom fake admin login page to trap unauthorized access attempts.
 
 ---
 
 ## 🛠️ Tech Stack
-
-| Layer | Technology |
-|---|---|
-| Backend | Django 6.0 (Python) |
-| Database | SQLite |
-| Frontend | HTML, CSS, Bootstrap 5 |
-| Icons | Bootstrap Icons |
-| Charts | Chart.js |
-| Typography | Inter (Google Fonts) |
+* **Backend:** Python + Django
+* **Database:** PostgreSQL (Hosted on Neon DB) / SQLite3 (Local)
+* **Storage:** Cloudinary (Media), WhiteNoise (Static Assets)
+* **Deployment:** Render + Gunicorn
 
 ---
 
-## 📁 Project Structure
+## 🚀 Local Deployment Setup
 
-```
-Managementwebapp/
-├── accounts/          # Login, logout, password change, decorators
-├── employees/         # Employee CRUD, profiles, salary management
-├── departments/       # Department CRUD
-├── attendance/        # Check-in/out, admin attendance overview
-├── leaves/            # Leave application & admin approval workflow
-├── dashboard/         # Admin dashboard with stats & charts
-├── ems_project/       # Django project settings & root URLs
-├── templates/         # All HTML templates
-├── static/            # CSS & JavaScript files
-├── media/             # Uploaded profile pictures
-└── manage.py
+To clone and run this project locally, follow these steps:
+
+### 1. Clone the repository
+```bash
+git clone https://github.com/Hi-There-shuvo/Employee-management-system.git
+cd Employee-management-system
 ```
 
----
+### 2. Create and Activate Virtual Environment
+```bash
+python -m venv venv
+# On Windows
+venv\Scripts\activate
+# On Mac/Linux
+source venv/bin/activate
+```
 
-## 🚀 Setup & Installation
+### 3. Install Dependencies
+```bash
+pip install -r requirements.txt
+```
 
-### Prerequisites
-- Python 3.10+
-- pip
+### 4. Create a `.env` file
+Create a new file named `.env` in the root directory:
+```env
+ENVIRONMENT=development
+SECRET_KEY=your-local-secret-key-xyz123
+DATABASE_URL=postgres://neondb_owner:... # Get this from Neon
+CLOUDINARY_CLOUD_NAME=your_cloud_name
+CLOUDINARY_API_KEY=your_api_key
+CLOUDINARY_API_SECRET=your_api_secret
+```
+*(Note: As `ENVIRONMENT` is set to `development`, the project will temporarily ignore PostgreSQL limits and Cloudinary storage to boost your local development speed).*
 
-### Steps
+### 5. Run Migrations & Start Server
+```bash
+python manage.py makemigrations
+python manage.py migrate
+python manage.py runserver
+```
 
-1. **Clone the repository**
-   ```bash
-   https://github.com/Hi-There-shuvo/Employee-management-system
-   ```
-
-2. **Create a virtual environment**
-   ```bash
-   python -m venv venv
-   ```
-
-3. **Activate the virtual environment**
-   - Windows:
-     ```bash
-     venv\Scripts\activate
-     ```
-   - macOS/Linux:
-     ```bash
-     source venv/bin/activate
-     ```
-
-4. **Install dependencies**
-   ```bash
-   pip install django pillow
-   ```
-
-5. **Run migrations**
-   ```bash
-   python manage.py migrate
-   ```
-
-6. **Create a superuser**
-   ```bash
-   python manage.py createsuperuser
-   ```
-
-7. **Run the development server**
-   ```bash
-   python manage.py runserver
-   ```
-
-8. **Open in browser**
-   - Application: [http://127.0.0.1:8000/](http://127.0.0.1:8000/)
-   - Admin Panel: [http://127.0.0.1:8000/matha/](http://127.0.0.1:8000/matha/)
+Open `http://localhost:8000` to view the application.
 
 ---
 
-## 📸 Screenshots
+## 👨‍💻 Developer Information
 
-<!-- Add your screenshots here -->
-<!-- ![Dashboard](screenshots/dashboard.png) -->
-<!-- ![Employee List](screenshots/employees.png) -->
-<!-- ![Attendance](screenshots/attendance.png) -->
+Built and maintained by **[Mia Shuvo](https://github.com/Hi-There-shuvo)**. 
 
----
-
-## 👥 User Roles
-
-| Feature | Admin | Employee |
-|---|---|---|
-| Dashboard | ✅ | ❌ |
-| Manage Employees | ✅ Full CRUD | View/edit own profile |
-| Manage Departments | ✅ Full CRUD | ❌ |
-| Attendance | ✅ View all | Check in/out, view own |
-| Leaves | ✅ Approve/reject | Apply, view own |
-| Salary | ✅ Add records | View own |
-| Change Password | ✅ | ✅ |
-
----
-
-## 📄 License
-
-This project is developed as part of the CSE-3100 course.
+If you find this project helpful or insightful, please consider leaving a ⭐ on the repository!

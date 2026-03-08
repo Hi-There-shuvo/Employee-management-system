@@ -34,7 +34,7 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = True if ENVIRONMENT == 'development' else False
 # Temporarily True so CSS works while testing Cloudinary locally
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['employee-management-system-m4dk.onrender.com', 'localhost', '127.0.0.1']
 
 
 # Application definition

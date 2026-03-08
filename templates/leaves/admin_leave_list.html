@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+
+{% block title %}Leave Management{% endblock %}
+{% block page_title %}Leave Management{% endblock %}
+
+{% block content %}
+<!-- Filter -->
+<div class="form-card mb-4">
+    <form method="get" class="row g-3">
+        <div class="col-md-4">
+            <select name="status" class="form-select">
+                <option value="">All Status</option>
+                <option value="pending" {% if current_status == "pending" %}selected{% endif %}>Pending</option>
+                <option value="approved" {% if current_status == "approved" %}selected{% endif %}>Approved</option>
+                <option value="rejected" {% if current_status == "rejected" %}selected{% endif %}>Rejected</option>
+            </select>
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-filter"></i> Filter</button>
+        </div>
+    </form>
+</div>
+
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Type</th>
+                    <th>From</th>
+                    <th>To</th>
+                    <th>Days</th>
+                    <th>Reason</th>
+                    <th>Status</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for leave in leaves %}
+                <tr>
+                    <td>{{ leave.employee.full_name }}</td>
+                    <td>{{ leave.get_leave_type_display }}</td>
+                    <td>{{ leave.start_date|date:"M d" }}</td>
+                    <td>{{ leave.end_date|date:"M d" }}</td>
+                    <td>{{ leave.duration }}</td>
+                    <td><small>{{ leave.reason|truncatewords:10 }}</small></td>
+                    <td><span class="badge-status badge-{{ leave.status }}">{{ leave.get_status_display }}</span></td>
+                    <td>
+                        {% if leave.status == 'pending' %}
+                        <div class="d-flex gap-1">
+                            <form method="post" action="{% url 'leaves:action' leave.pk 'approve' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="admin_remarks" value="">
+                                <button type="submit" class="btn btn-sm btn-success" title="Approve"><i
+                                        class="bi bi-check-lg"></i></button>
+                            </form>
+                            <form method="post" action="{% url 'leaves:action' leave.pk 'reject' %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="admin_remarks" value="">
+                                <button type="submit" class="btn btn-sm btn-danger" title="Reject"><i
+                                        class="bi bi-x-lg"></i></button>
+                            </form>
+                        </div>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="8" class="text-center text-muted py-4">No leave requests found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link"
+                href="?page={{ page_obj.previous_page_number }}&status={{ current_status }}">Previous</a></li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}&status={{ current_status }}">{{ num }}</a>
+        </li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link"
+                href="?page={{ page_obj.next_page_number }}&status={{ current_status }}">Next</a></li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

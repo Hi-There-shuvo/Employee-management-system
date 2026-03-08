@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Log in | Django site admin</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Segoe UI", system-ui, Roboto, sans-serif;
+            background: #fff;
+            color: #333;
+        }
+
+        #header {
+            background: #417690;
+            color: #ffc;
+            padding: 10px 40px;
+        }
+
+        #header h1 {
+            font-size: 18px;
+            font-weight: 400;
+        }
+
+        #header h1 a {
+            color: #ffc;
+            text-decoration: none;
+        }
+
+        #header #branding h1 a:hover {
+            text-decoration: underline;
+        }
+
+        #content-main {
+            width: 100%;
+        }
+
+        #container {
+            position: relative;
+            width: 100%;
+            padding: 0;
+        }
+
+        #content {
+            padding: 20px 40px;
+        }
+
+        #content h1 {
+            font-size: 18px;
+            margin: 0 0 15px;
+            color: #333;
+        }
+
+        .errornote {
+            background: #ffc;
+            border: 1px solid #dda;
+            color: #333;
+            padding: 10px 12px;
+            margin: 0 0 10px;
+            font-size: 13px;
+            display: block;
+        }
+
+        .errornote p {
+            margin: 0;
+        }
+
+        #login-form {
+            margin: 0;
+        }
+
+        .form-row {
+            padding: 10px 0;
+            overflow: hidden;
+            font-size: 13px;
+        }
+
+        .form-row label {
+            display: block;
+            padding: 0 0 3px;
+            float: left;
+            width: 9em;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-row input[type="text"],
+        .form-row input[type="password"] {
+            padding: 5px 6px;
+            border: 1px solid #ccc;
+            font-size: 13px;
+            width: 20em;
+        }
+
+        .form-row input[type="text"]:focus,
+        .form-row input[type="password"]:focus {
+            border-color: #417690;
+            outline: none;
+        }
+
+        .submit-row {
+            padding: 12px 0 12px 9em;
+            margin: 0;
+        }
+
+        .submit-row input[type="submit"] {
+            background: #417690;
+            color: #fff;
+            border: none;
+            padding: 7px 18px;
+            font-size: 13px;
+            cursor: pointer;
+            border-radius: 0;
+        }
+
+        .submit-row input[type="submit"]:hover {
+            background: #205067;
+        }
+
+        #footer {
+            color: #999;
+            padding: 12px 40px;
+            font-size: 11px;
+            text-align: right;
+            border-top: 1px solid #eee;
+            position: fixed;
+            bottom: 0;
+            width: 100%;
+            background: #fff;
+        }
+
+        .help {
+            font-size: 11px;
+            color: #999;
+            padding-left: 9em;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="container">
+        <div id="header">
+            <div id="branding">
+                <h1><a href="/admin/">Django administration</a></h1>
+            </div>
+        </div>
+
+        <div id="content" class="colM">
+            <h1>Log in</h1>
+
+            {% if error_message %}
+            <p class="errornote">
+                {{ error_message }}
+            </p>
+            {% endif %}
+
+            <div id="content-main">
+                <form id="login-form" method="post" action="/admin/">
+                    {% csrf_token %}
+                    <div class="form-row">
+                        <label for="id_username">Username:</label>
+                        <input type="text" name="username" id="id_username" autofocus required>
+                    </div>
+                    <div class="form-row">
+                        <label for="id_password">Password:</label>
+                        <input type="password" name="password" id="id_password" required>
+                        <input type="hidden" name="next" value="/admin/">
+                    </div>
+                    <div class="submit-row">
+                        <input type="submit" value="Log in">
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div id="footer"></div>
+    </div>
+</body>
+
+</html>

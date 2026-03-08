@@ -1,0 +1,83 @@
+{% extends 'base.html' %}
+
+{% block title %}My Attendance{% endblock %}
+{% block page_title %}My Attendance{% endblock %}
+
+{% block content %}
+<!-- Check In/Out Card -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="stat-card">
+            <h5 class="mb-3"><i class="bi bi-clock"></i> Today's Status</h5>
+            {% if today_record %}
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <p class="mb-1">Check In: <strong>{{ today_record.check_in|time:"h:i A" }}</strong></p>
+                    <p class="mb-1">Check Out: <strong>{{ today_record.check_out|time:"h:i A"|default:"Not yet"}}</strong></p>
+                    <span class="badge-status badge-{{ today_record.status }}">{{ today_record.get_status_display }}</span>
+                </div>
+                {% if not today_record.check_out %}
+                <form method="post" action="{% url 'attendance:check_out' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-danger"><i class="bi bi-box-arrow-right"></i> Check
+                        Out</button>
+                </form>
+                {% endif %}
+            </div>
+            {% else %}
+            <p class="text-muted mb-3">You haven't checked in today.</p>
+            <form method="post" action="{% url 'attendance:check_in' %}">
+                {% csrf_token %}
+                <button type="submit" class="btn btn-success"><i class="bi bi-box-arrow-in-right"></i> Check In</button>
+            </form>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Attendance History -->
+<div class="table-card">
+    <div class="card-header"><i class="bi bi-calendar-check"></i> Attendance History</div>
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attendances %}
+                <tr>
+                    <td>{{ att.date|date:"M d, Y" }}</td>
+                    <td>{{ att.check_in|time:"h:i A"|default:"-" }}</td>
+                    <td>{{ att.check_out|time:"h:i A"|default:"-" }}</td>
+                    <td><span class="badge-status badge-{{ att.status }}">{{ att.get_status_display }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4" class="text-center text-muted py-4">No attendance records yet.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}<li class="page-item"><a class="page-link"
+                href="?page={{ page_obj.previous_page_number }}">Previous</a></li>{% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if num == page_obj.number %}active{% endif %}"><a class="page-link"
+                href="?page={{ num }}">{{ num }}</a></li>
+        {% endfor %}
+        {% if page_obj.has_next %}<li class="page-item"><a class="page-link"
+                href="?page={{ page_obj.next_page_number }}">Next</a></li>{% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

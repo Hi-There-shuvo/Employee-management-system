@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Management{% endblock %}
+{% block page_title %}Attendance Management{% endblock %}
+
+{% block content %}
+<!-- Filters -->
+<div class="form-card mb-4">
+    <form method="get" class="row g-3">
+        <div class="col-md-3">
+            <input type="text" name="q" class="form-control" placeholder="Search employee..."
+                value="{{ current_query }}">
+        </div>
+        <div class="col-md-3">
+            <select name="status" class="form-select">
+                <option value="">All Status</option>
+                <option value="present" {% if current_status == "present" %}selected{% endif %}>Present</option>
+                <option value="late" {% if current_status == "late" %}selected{% endif %}>Late</option>
+                <option value="absent" {% if current_status == "absent" %}selected{% endif %}>Absent</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <input type="date" name="date" class="form-control" value="{{ current_date }}">
+        </div>
+        <div class="col-md-3">
+            <button type="submit" class="btn btn-primary w-100"><i class="bi bi-search"></i> Filter</button>
+        </div>
+    </form>
+</div>
+
+<!-- Attendance Table -->
+<div class="table-card">
+    <div class="table-responsive">
+        <table class="table table-hover mb-0">
+            <thead>
+                <tr>
+                    <th>Employee</th>
+                    <th>Date</th>
+                    <th>Check In</th>
+                    <th>Check Out</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for att in attendances %}
+                <tr>
+                    <td>{{ att.employee.full_name }}</td>
+                    <td>{{ att.date|date:"M d, Y" }}</td>
+                    <td>{{ att.check_in|time:"h:i A"|default:"-" }}</td>
+                    <td>{{ att.check_out|time:"h:i A"|default:"-" }}</td>
+                    <td><span class="badge-status badge-{{ att.status }}">{{ att.get_status_display }}</span></td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="5" class="text-center text-muted py-4">No attendance records found.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+{% if is_paginated %}
+<nav class="mt-4">
+    <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+        <li class="page-item"><a class="page-link"
+                href="?page={{ page_obj.previous_page_number }}&q={{ current_query }}&status={{ current_status }}&date={{ current_date }}">Previous</a>
+        </li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+        <li class="page-item {% if num == page_obj.number %}active{% endif %}">
+            <a class="page-link"
+                href="?page={{ num }}&q={{ current_query }}&status={{ current_status }}&date={{ current_date }}">{{ num
+                }}</a>
+        </li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+        <li class="page-item"><a class="page-link"
+                href="?page={{ page_obj.next_page_number }}&q={{ current_query }}&status={{ current_status }}&date={{ current_date }}">Next</a>
+        </li>
+        {% endif %}
+    </ul>
+</nav>
+{% endif %}
+{% endblock %}

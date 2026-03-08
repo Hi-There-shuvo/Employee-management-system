@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block title %}Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
+
+{% block content %}
+<!-- Summary Cards -->
+<div class="row g-4 mb-4">
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-value">{{ total_employees }}</div>
+                    <div class="stat-label">Total Employees</div>
+                </div>
+                <div class="stat-icon bg-primary"><i class="bi bi-people"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-value">{{ total_departments }}</div>
+                    <div class="stat-label">Departments</div>
+                </div>
+                <div class="stat-icon bg-secondary"><i class="bi bi-diagram-3"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-value">{{ today_checked_in }}</div>
+                    <div class="stat-label">Checked In Today</div>
+                </div>
+                <div class="stat-icon bg-success"><i class="bi bi-calendar-check"></i></div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="stat-card">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <div class="stat-value">{{ on_leave_today }}</div>
+                    <div class="stat-label">On Leave Today</div>
+                </div>
+                <div class="stat-icon bg-warning"><i class="bi bi-calendar-x"></i></div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Charts Row -->
+<div class="row g-4 mb-4">
+    <div class="col-md-6">
+        <div class="table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-bar-chart"></i> Department Employee Count</span>
+            </div>
+            <div class="p-3">
+                <canvas id="deptChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="table-card">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <span><i class="bi bi-pie-chart"></i> Today's Attendance</span>
+            </div>
+            <div class="p-3">
+                <canvas id="attendanceChart" height="250"></canvas>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Tables Row -->
+<div class="row g-4">
+    <div class="col-md-6">
+        <div class="table-card">
+            <div class="card-header">
+                <i class="bi bi-clock-history"></i> Pending Leave Requests
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Type</th>
+                            <th>Dates</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for leave in pending_leaves %}
+                        <tr>
+                            <td>{{ leave.employee.full_name }}</td>
+                            <td>{{ leave.get_leave_type_display }}</td>
+                            <td>{{ leave.start_date|date:"M d" }} - {{ leave.end_date|date:"M d" }}</td>
+                            <td><a href="{% url 'leaves:admin_list' %}" class="btn btn-sm btn-outline-primary">View</a>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-3">No pending requests</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="table-card">
+            <div class="card-header">
+                <i class="bi bi-calendar-check"></i> Today's Attendance
+            </div>
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead>
+                        <tr>
+                            <th>Employee</th>
+                            <th>Check In</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for att in recent_attendance %}
+                        <tr>
+                            <td>{{ att.employee.full_name }}</td>
+                            <td>{{ att.check_in|time:"h:i A" }}</td>
+                            <td><span class="badge-status badge-{{ att.status }}">{{ att.get_status_display }}</span>
+                            </td>
+                        </tr>
+                        {% empty %}
+                        <tr>
+                            <td colspan="3" class="text-center text-muted py-3">No records yet</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+    // Department Chart
+    new Chart(document.getElementById('deptChart'), {
+        type: 'bar',
+        data: {
+            labels: {{ dept_labels| safe }},
+        datasets: [{
+            label: 'Employees',
+            data: {{ dept_counts| safe }},
+        backgroundColor: ['#4361ee', '#7209b7', '#06d6a0', '#ffd166', '#ef476f', '#118ab2'],
+        borderRadius: 8,
+            }]
+        },
+        options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: { y: { beginAtZero: true, ticks: { stepSize: 1 } } }
+    }
+    });
+
+    // Attendance Chart
+    new Chart(document.getElementById('attendanceChart'), {
+        type: 'doughnut',
+        data: {
+            labels: ['Present', 'Late', 'On Leave'],
+            datasets: [{
+                data: [{{ today_present }}, {{ today_late }}, {{ on_leave_today }}],
+        backgroundColor: ['#06d6a0', '#ffd166', '#ef476f'],
+            }]
+        },
+        options: {
+        responsive: true,
+        plugins: { legend: { position: 'bottom' } }
+    }
+    });
+</script>
+{% endblock %}

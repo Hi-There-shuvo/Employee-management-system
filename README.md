@@ -69,8 +69,7 @@ Managementwebapp/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/YOUR_USERNAME/Managementwebapp.git
-   cd Managementwebapp
+   https://github.com/Hi-There-shuvo/Employee-management-system
    ```
 
 2. **Create a virtual environment**
